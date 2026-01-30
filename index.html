@@ -5,32 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>กิจกรรมวันตรุษจีน - โรงเรียนวังน้ำเย็นวิทยาคม</title>
     
-    <!-- 1. Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Load React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- 3. Load Babel (to compile JSX) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
-    <!-- Font for Certificate -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; }
-        @media print {
-            @page { size: landscape; margin: 0; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .no-print { display: none !important; }
-        }
     </style>
 </head>
 <body class="bg-amber-50">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         // --- Icons ---
         const Icon = ({ path, className }) => (
@@ -42,23 +35,22 @@
             XCircle: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>} />,
             ArrowRight: (props) => <Icon {...props} path={<><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>} />,
             RotateCcw: (props) => <Icon {...props} path={<><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></>} />,
-            Printer: (props) => <Icon {...props} path={<><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></>} />,
+            Download: (props) => <Icon {...props} path={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>} />,
             Settings: (props) => <Icon {...props} path={<><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>} />,
             Move: (props) => <Icon {...props} path={<><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="19 9 22 12 19 15"/><polyline points="9 19 12 22 15 19"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></>} />,
             Palette: (props) => <Icon {...props} path={<><path d="M13.5 2h-9A4.5 4.5 0 0 0 2 6.5v9A4.5 4.5 0 0 0 6.5 20v0a4.5 4.5 0 0 0 4.5-4.5V15a2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5v.5A4.5 4.5 0 0 0 20.5 20v0A4.5 4.5 0 0 0 25 15.5v-9A4.5 4.5 0 0 0 20.5 2H13.5z"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/><circle cx="18" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></>} />,
             Loader2: (props) => <Icon {...props} className={props.className + " animate-spin"} path={<><path d="M21 12a9 9 0 1 1-6.219-8.56"/></>} />,
-            CloudOff: (props) => <Icon {...props} path={<><path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3"/><line x1="1" y1="1" x2="23" y2="23"/></>} />
+            CloudOff: (props) => <Icon {...props} path={<><path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3"/><line x1="1" y1="1" x2="23" y2="23"/></>} />,
+            Search: (props) => <Icon {...props} path={<><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>} />
         };
 
         const QuizApp = () => {
-            // --- Configuration ---
             const PASSING_SCORE = 60; 
             const QUIZ_SIZE = 20; 
             const BACKGROUND_URL = "https://img5.pic.in.th/file/secure-sv1/-----10a03cff1a396fda.png";
             const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwq-DX6jf3yjU4fq4DMxHeAHqLs1BlClmxkGixO_6QpXZ4sv7qD6YN6ffq5FH297amP/exec"; 
 
-            // --- State ---
-            const [appState, setAppState] = useState('welcome');
+            const [appState, setAppState] = useState('welcome'); // welcome, quiz, result, search
             const [allRawQuestions, setAllRawQuestions] = useState([]); 
             const [questions, setQuestions] = useState([]); 
             const [isLoading, setIsLoading] = useState(true);
@@ -71,14 +63,51 @@
             const [answers, setAnswers] = useState([]);
             const [isSaving, setIsSaving] = useState(false);
             const [dataStatus, setDataStatus] = useState(null);
+            
+            // Search State
+            const [searchTerm, setSearchTerm] = useState('');
+            const [isSearching, setIsSearching] = useState(false);
+            const [searchMsg, setSearchMsg] = useState('');
 
             const [showEditor, setShowEditor] = useState(false);
             const [textColor, setTextColor] = useState('#1e293b');
-            const [layout, setLayout] = useState({
-                name: { x: 50, y: 38, size: 20 }
-            });
+            const [layout, setLayout] = useState({ name: { x: 50, y: 38, size: 20 } });
+            
+            // Certificate Ref
+            const certRef = useRef(null);
 
-            // --- Helper: Shuffle Array ---
+            // --- Init Check ---
+            useEffect(() => {
+                // Check local storage for previous success
+                const savedData = localStorage.getItem('cny_quiz_result');
+                if (savedData) {
+                    try {
+                        const parsed = JSON.parse(savedData);
+                        if (parsed.passed) {
+                            // User already passed, show recovery option button in Welcome screen
+                        }
+                    } catch (e) {}
+                }
+
+                setIsLoading(true);
+                fetch(GOOGLE_SCRIPT_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && Array.isArray(data)) {
+                            setAllRawQuestions(data);
+                        } else {
+                            throw new Error("No data");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        setFetchError(true);
+                        // Fallback data
+                         setAllRawQuestions([{ id: 0, question: "โหลดข้อสอบไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต", options: ["-", "-", "-", "-"], correct: 0 }]);
+                    })
+                    .finally(() => setIsLoading(false));
+            }, []);
+
             const shuffleArray = (array) => {
                 const newArray = [...array];
                 for (let i = newArray.length - 1; i > 0; i--) {
@@ -88,65 +117,21 @@
                 return newArray;
             };
 
-            // --- Helper: Process & Randomize Quiz ---
             const generateRandomQuiz = (sourceData) => {
                 if (!sourceData || sourceData.length === 0) return [];
-
-                // 1. สุ่มลำดับโจทย์ทั้งหมด
                 const shuffledAll = shuffleArray(sourceData);
-
-                // 2. ตัดมา 20 ข้อ
                 const selected = shuffledAll.slice(0, QUIZ_SIZE);
-
-                // 3. สลับตัวเลือกในแต่ละข้อ
-                const finalQuiz = selected.map(q => {
-                    const optionsWithStatus = q.options.map((opt, index) => ({
-                        text: opt,
-                        isCorrect: index === q.correct
-                    }));
-
+                return selected.map(q => {
+                    const optionsWithStatus = q.options.map((opt, index) => ({ text: opt, isCorrect: index === q.correct }));
                     const shuffledOptions = shuffleArray(optionsWithStatus);
-                    const newCorrectIndex = shuffledOptions.findIndex(o => o.isCorrect);
-
                     return {
                         ...q,
                         options: shuffledOptions.map(o => o.text),
-                        correct: newCorrectIndex 
+                        correct: shuffledOptions.findIndex(o => o.isCorrect)
                     };
                 });
-
-                return finalQuiz;
             };
 
-            // --- Fetch Data ---
-            useEffect(() => {
-                setIsLoading(true);
-                fetch(GOOGLE_SCRIPT_URL)
-                    .then(res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.includes("application/json")) {
-                            return res.json();
-                        } else {
-                            throw new Error("Response was not JSON");
-                        }
-                    })
-                    .then(data => {
-                        if (data && Array.isArray(data) && data.length > 0) {
-                            setAllRawQuestions(data);
-                            setFetchError(false);
-                        } else {
-                            throw new Error("No data received");
-                        }
-                    })
-                    .catch(err => {
-                        console.error("Error:", err);
-                        setFetchError(true);
-                        setAllRawQuestions([{ id: 0, question: "โหลดข้อสอบไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต", options: ["-", "-", "-", "-"], correct: 0 }]);
-                    })
-                    .finally(() => setIsLoading(false));
-            }, []);
-
-            // --- Handlers ---
             const handleInputChange = (e) => {
                 const { name, value } = e.target;
                 setUserData(prev => ({ ...prev, [name]: value }));
@@ -154,7 +139,7 @@
             };
 
             const startQuiz = () => {
-                if (userData.name.trim() && !isLoading && !fetchError) {
+                if (userData.name.trim()) {
                     const newQuizSet = generateRandomQuiz(allRawQuestions);
                     setQuestions(newQuizSet);
                     setAnswers(Array(newQuizSet.length).fill(null));
@@ -185,6 +170,19 @@
             };
 
             const finishQuiz = (finalScore) => {
+                const passed = (finalScore / questions.length) * 100 >= PASSING_SCORE;
+                
+                // Save to Local Storage immediately
+                localStorage.setItem('cny_quiz_result', JSON.stringify({
+                    name: userData.name,
+                    class: userData.class,
+                    number: userData.number,
+                    score: finalScore,
+                    total: questions.length,
+                    passed: passed,
+                    date: new Date().toISOString()
+                }));
+
                 setAppState('result');
                 saveScoreToSheet(finalScore);
             };
@@ -210,6 +208,29 @@
                 .finally(() => setIsSaving(false));
             };
 
+            // --- Download Logic (Image) ---
+            const downloadImage = async () => {
+                if (!certRef.current) return;
+                
+                try {
+                    // Show loading or visual feedback if needed
+                    const canvas = await html2canvas(certRef.current, {
+                        scale: 2, // High resolution
+                        useCORS: true, // Allow loading external images
+                        backgroundColor: null
+                    });
+                    
+                    const image = canvas.toDataURL("image/png");
+                    const link = document.createElement("a");
+                    link.href = image;
+                    link.download = `Certificate_${userName}.png`;
+                    link.click();
+                } catch (err) {
+                    console.error("Download failed", err);
+                    alert("เกิดข้อผิดพลาดในการบันทึกภาพ กรุณาลองใหม่");
+                }
+            };
+
             const resetQuiz = () => {
                 setAppState('welcome');
                 setCurrentQuestion(0);
@@ -220,6 +241,48 @@
                 setShowEditor(false);
                 setDataStatus(null);
                 setQuestions([]);
+                setSearchTerm('');
+            };
+            
+            // --- Search Function ---
+            const handleSearch = () => {
+                setIsSearching(true);
+                setSearchMsg('');
+
+                // 1. Search Local Storage first (Instant)
+                const saved = localStorage.getItem('cny_quiz_result');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.name.includes(searchTerm) || parsed.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        setUserData({ name: parsed.name, class: parsed.class, number: parsed.number });
+                        setUserName(parsed.name);
+                        setScore(parsed.score);
+                        setQuestions(Array(parsed.total).fill(0)); // Dummy array to calc percentage
+                        setIsSearching(false);
+                        setAppState('result');
+                        return;
+                    }
+                }
+
+                // 2. Search Server (Need Google Script Update)
+                // Note: This requires the Google Script to handle ?action=search
+                fetch(`${GOOGLE_SCRIPT_URL}?action=search&name=${encodeURIComponent(searchTerm)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.found) {
+                            setUserData({ name: data.name, class: data.class, number: data.number });
+                            setUserName(data.name);
+                            setScore(data.score); // Assuming score is returned
+                            setQuestions(Array(20).fill(0)); 
+                            setAppState('result');
+                        } else {
+                            setSearchMsg("ไม่พบข้อมูล หรือระบบค้นหายังไม่เปิดใช้งาน");
+                        }
+                    })
+                    .catch(err => {
+                        setSearchMsg("ไม่พบประวัติในเครื่องนี้ (และ Server ไม่ตอบกลับ)");
+                    })
+                    .finally(() => setIsSearching(false));
             };
 
             const calculatePercentage = () => {
@@ -232,7 +295,7 @@
                 setLayout(prev => ({ ...prev, [el]: { ...prev[el], [field]: parseFloat(val) } }));
             };
 
-            // --- UI ---
+            // --- Render ---
             if (appState === 'welcome') {
                 return (
                     <div className="min-h-screen bg-amber-50 flex items-center justify-center p-4 font-sans">
@@ -244,20 +307,20 @@
                                     <img src="https://img5.pic.in.th/file/secure-sv1/Brown-Illustration-Coffee-House-Logo.png" alt="Logo" className="w-full h-full object-cover" />
                                 </div>
                                 <h1 className="text-xl font-bold text-white mb-1">กิจกรรมวันตรุษจีน</h1>
-                                <h2 className="text-sm text-yellow-100 mb-2">โรงเรียนวังน้ำเย็นวิทยาคม</h2>
                                 <p className="text-red-100 text-sm">ทดสอบความรู้และรับเกียรติบัตรออนไลน์</p>
                             </div>
+                            
+                            {/* Tabs */}
+                            <div className="flex border-b">
+                                <button className="flex-1 py-3 text-sm font-semibold text-red-600 border-b-2 border-red-600 bg-red-50">เข้าสู่ระบบสอบ</button>
+                                <button onClick={() => setAppState('search')} className="flex-1 py-3 text-sm font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-50 transition-colors">ค้นหาเกียรติบัตร</button>
+                            </div>
+
                             <div className="p-8">
                                 {isLoading ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                         <Icons.Loader2 className="w-10 h-10 text-red-600 mb-3" />
-                                        <p>กำลังโหลดข้อสอบจากระบบ...</p>
-                                    </div>
-                                ) : fetchError ? (
-                                    <div className="flex flex-col items-center justify-center py-8 text-red-500 text-center">
-                                        <Icons.CloudOff className="w-10 h-10 mb-3" />
-                                        <p className="font-bold">ไม่สามารถเชื่อมต่อข้อมูลได้</p>
-                                        <p className="text-xs mt-1">กรุณาตรวจสอบอินเทอร์เน็ต</p>
+                                        <p>กำลังโหลดข้อสอบ...</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
@@ -275,18 +338,52 @@
                                                 <input type="number" name="number" value={userData.number} onChange={handleInputChange} placeholder="1" className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-red-500 outline-none" />
                                             </div>
                                         </div>
-                                        <div className="bg-red-50 p-4 rounded-lg text-sm text-red-800 border border-red-100">
-                                            <p className="font-semibold mb-1">เงื่อนไขการรับเกียรติบัตร:</p>
-                                            <ul className="list-disc list-inside space-y-1 text-red-700 text-xs">
-                                                <li>ต้องได้คะแนนมากกว่า {PASSING_SCORE}%</li>
-                                                <li>ระบบจะสุ่มข้อสอบ {QUIZ_SIZE} ข้อ (จากคลังทั้งหมด)</li>
-                                            </ul>
-                                        </div>
-                                        <button onClick={startQuiz} disabled={!userData.name.trim() || !userData.class.trim() || !userData.number.trim()} className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all ${userData.name.trim() && userData.class.trim() && userData.number.trim() ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                                        <button onClick={startQuiz} disabled={!userData.name.trim() || !userData.class.trim()} className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all ${userData.name.trim() ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
                                             เริ่มทำแบบทดสอบ <Icons.ArrowRight className="w-5 h-5" />
                                         </button>
+                                        
+                                        {/* Local Storage Quick Load */}
+                                        {localStorage.getItem('cny_quiz_result') && (
+                                            <div onClick={() => {
+                                                const saved = JSON.parse(localStorage.getItem('cny_quiz_result'));
+                                                setUserData({name: saved.name, class: saved.class, number: saved.number});
+                                                setUserName(saved.name);
+                                                setScore(saved.score);
+                                                setQuestions(Array(saved.total).fill(0));
+                                                setAppState('result');
+                                            }} className="mt-4 text-center text-xs text-blue-500 underline cursor-pointer hover:text-blue-700">
+                                                พบประวัติการสอบล่าสุด: {JSON.parse(localStorage.getItem('cny_quiz_result')).name} (คลิกเพื่อดู)
+                                            </div>
+                                        )}
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (appState === 'search') {
+                return (
+                    <div className="min-h-screen bg-amber-50 flex items-center justify-center p-4 font-sans">
+                        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border-t-4 border-blue-500">
+                            <div className="bg-blue-600 p-6 text-center text-white">
+                                <h1 className="text-xl font-bold">ค้นหาเกียรติบัตร</h1>
+                                <p className="text-blue-100 text-sm">พิมพ์ชื่อเพื่อค้นหาผลการสอบย้อนหลัง</p>
+                            </div>
+                            <div className="flex border-b">
+                                <button onClick={() => setAppState('welcome')} className="flex-1 py-3 text-sm font-semibold text-slate-500 hover:text-red-600 hover:bg-slate-50 transition-colors">เข้าสู่ระบบสอบ</button>
+                                <button className="flex-1 py-3 text-sm font-semibold text-blue-600 border-b-2 border-blue-600 bg-blue-50">ค้นหาเกียรติบัตร</button>
+                            </div>
+                            <div className="p-8 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">ค้นหาชื่อ (ภาษาอังกฤษ)</label>
+                                    <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="SEARCH NAME..." className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none uppercase" />
+                                </div>
+                                <button onClick={handleSearch} disabled={isSearching || !searchTerm} className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center justify-center gap-2">
+                                    {isSearching ? <Icons.Loader2 className="w-5 h-5"/> : <Icons.Search className="w-5 h-5" />} ค้นหา
+                                </button>
+                                {searchMsg && <p className="text-center text-red-500 text-sm mt-2">{searchMsg}</p>}
                             </div>
                         </div>
                     </div>
@@ -322,35 +419,43 @@
             }
 
             return (
-                <div className="min-h-screen bg-slate-100 p-4 md:p-8 font-sans print:bg-white print:p-0">
-                    <div className="max-w-6xl mx-auto mb-8 print:hidden flex flex-col md:flex-row gap-6">
+                <div className="min-h-screen bg-slate-100 p-4 md:p-8 font-sans">
+                    <div className="max-w-6xl mx-auto mb-8 flex flex-col md:flex-row gap-6">
                         <div className={`flex-1 rounded-2xl shadow-lg p-8 text-center bg-white border-t-4 ${isPassed ? 'border-green-500' : 'border-red-500'}`}>
                             <div className="flex justify-center mb-4">
                                 {isPassed ? <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"><Icons.Award className="text-green-600" /></div> : <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center"><Icons.XCircle className="text-red-600" /></div>}
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-800 mb-1">{isPassed ? "ผ่านการทดสอบ!" : "ยังไม่ผ่านเกณฑ์"}</h2>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-1">{isPassed ? "ยินดีด้วย คุณสอบผ่าน!" : "ยังไม่ผ่านเกณฑ์"}</h2>
                             <p className="text-slate-500 mb-6 text-sm">คะแนนของคุณ: {score}/{questions.length} ({calculatePercentage()}%)</p>
                             
+                            {/* Save Status */}
                             <div className="mb-6 h-6 flex justify-center">
                                 {isSaving && <p className="text-sm text-blue-500 flex items-center gap-2"><Icons.Loader2 className="w-4 h-4" /> กำลังบันทึกคะแนน...</p>}
-                                {!isSaving && dataStatus === 'success' && <p className="text-sm text-green-600 flex items-center gap-1"><Icons.CheckCircle className="w-4 h-4"/> บันทึกคะแนนเรียบร้อย</p>}
-                                {!isSaving && dataStatus === 'error' && <p className="text-sm text-red-500 flex items-center gap-1"><Icons.XCircle className="w-4 h-4"/> บันทึกคะแนนไม่สำเร็จ</p>}
+                                {!isSaving && dataStatus === 'success' && <p className="text-sm text-green-600 flex items-center gap-1"><Icons.CheckCircle className="w-4 h-4"/> บันทึกเข้าระบบแล้ว</p>}
+                                {!isSaving && dataStatus === 'error' && <p className="text-sm text-red-500 flex items-center gap-1"><Icons.XCircle className="w-4 h-4"/> บันทึกออนไลน์ไม่สำเร็จ (บันทึกลงเครื่องแล้ว)</p>}
                             </div>
 
                             <div className="grid grid-cols-1 gap-3">
                                 {isPassed && (
                                     <>
-                                        <button onClick={() => window.print()} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-red-600 text-white hover:bg-red-700 shadow-lg"><Icons.Printer className="w-5 h-5" /> พิมพ์เกียรติบัตร (PDF)</button>
-                                        <button onClick={() => setShowEditor(!showEditor)} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200"><Icons.Settings className="w-5 h-5" /> {showEditor ? "ปิดตัวแก้ไข" : "ขยับตำแหน่งชื่อ"}</button>
+                                        <button onClick={downloadImage} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200 transition-all transform active:scale-95">
+                                            <Icons.Download className="w-5 h-5" /> ดาวน์โหลดเกียรติบัตร (รูปภาพ)
+                                        </button>
+                                        <button onClick={() => setShowEditor(!showEditor)} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200">
+                                            <Icons.Settings className="w-5 h-5" /> {showEditor ? "ปิดตัวแก้ไข" : "ปรับตำแหน่งชื่อ"}
+                                        </button>
                                     </>
                                 )}
-                                <button onClick={resetQuiz} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200"><Icons.RotateCcw className="w-5 h-5" /> สอบใหม่</button>
+                                <button onClick={resetQuiz} className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
+                                    <Icons.RotateCcw className="w-5 h-5" /> กลับหน้าหลัก
+                                </button>
                             </div>
                         </div>
 
+                        {/* Editor Panel */}
                         {isPassed && showEditor && (
                             <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-                                <h3 className="text-md font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.Settings className="w-5 h-5" /> ปรับแต่งตำแหน่งชื่อ</h3>
+                                <h3 className="text-md font-bold text-slate-800 mb-4 flex items-center gap-2"><Icons.Settings className="w-5 h-5" /> ปรับแต่ง</h3>
                                 <div className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-medium text-slate-700 mb-2 flex items-center gap-1"><Icons.Palette className="w-4 h-4" /> สีตัวอักษร</label>
@@ -362,21 +467,12 @@
                                     </div>
                                     <hr className="border-slate-100" />
                                     <div>
-                                        <label className="block text-xs font-medium text-slate-700 mb-2 flex items-center gap-1"><Icons.Move className="w-4 h-4" /> จัดตำแหน่งชื่อ</label>
+                                        <label className="block text-xs font-medium text-slate-700 mb-2 flex items-center gap-1"><Icons.Move className="w-4 h-4" /> จัดตำแหน่ง</label>
                                         <div className="mb-2 bg-slate-50 p-3 rounded border border-slate-100">
                                             <div className="grid grid-cols-1 gap-3">
-                                                <div>
-                                                    <span className="text-[10px] text-slate-400">แนวนอน</span>
-                                                    <input type="range" min="0" max="100" value={layout.name.x} onChange={(e)=>updateLayout('name','x',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-[10px] text-slate-400">แนวตั้ง</span>
-                                                    <input type="range" min="0" max="100" value={layout.name.y} onChange={(e)=>updateLayout('name','y',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-[10px] text-slate-400">ขนาด (pt)</span>
-                                                    <input type="range" min="10" max="60" value={layout.name.size} onChange={(e)=>updateLayout('name','size',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" />
-                                                </div>
+                                                <div><span className="text-[10px] text-slate-400">แนวนอน</span><input type="range" min="0" max="100" value={layout.name.x} onChange={(e)=>updateLayout('name','x',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" /></div>
+                                                <div><span className="text-[10px] text-slate-400">แนวตั้ง</span><input type="range" min="0" max="100" value={layout.name.y} onChange={(e)=>updateLayout('name','y',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" /></div>
+                                                <div><span className="text-[10px] text-slate-400">ขนาด</span><input type="range" min="10" max="60" value={layout.name.size} onChange={(e)=>updateLayout('name','size',e.target.value)} className="w-full h-1 bg-slate-300 rounded cursor-pointer" /></div>
                                             </div>
                                         </div>
                                     </div>
@@ -385,13 +481,17 @@
                         )}
                     </div>
 
+                    {/* Certificate Preview (Hidden off-screen when not downloading, or visible for preview) */}
                     {isPassed && (
-                        <div className="print:absolute print:top-0 print:left-0 print:w-full print:h-full print:m-0 print:z-50">
-                            <div className="max-w-[1123px] mx-auto bg-white relative shadow-2xl print:shadow-none overflow-hidden aspect-[1.414/1] select-none text-slate-900">
-                                <div className="relative w-full h-full">
-                                    <img src={BACKGROUND_URL} alt="Certificate Background" className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/1123x794?text=Background+Image+Error"; }} />
+                        <div className="mt-8 flex justify-center">
+                            {/* We use a container that fits the screen, but the inner cert is fixed size for capture */}
+                            <div className="relative shadow-2xl overflow-hidden max-w-full" style={{ width: '800px', aspectRatio: '1.414/1' }}>
+                                <div ref={certRef} className="relative w-full h-full bg-white text-slate-900 select-none">
+                                    <img src={BACKGROUND_URL} alt="Certificate Background" className="w-full h-full object-cover" 
+                                        onError={(e) => { e.target.onerror = null; e.target.src = "https://via.placeholder.com/1123x794?text=Background+Error"; }} 
+                                    />
                                     <div className="absolute transform -translate-x-1/2 -translate-y-1/2 font-bold whitespace-nowrap uppercase text-center w-full pointer-events-none"
-                                        style={{ left: `${layout.name.x}%`, top: `${layout.name.y}%`, color: textColor, fontSize: `${layout.name.size}pt`, fontFamily: 'Times New Roman, serif' }}>
+                                        style={{ left: `${layout.name.x}%`, top: `${layout.name.y}%`, color: textColor, fontSize: `${layout.name.size * 1.5}px`, fontFamily: 'Times New Roman, serif' }}>
                                         {userName}
                                     </div>
                                 </div>
